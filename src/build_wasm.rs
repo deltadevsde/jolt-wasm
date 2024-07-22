@@ -118,6 +118,22 @@ fn is_std() -> Option<bool> {
     let package = dependencies.get("package")?.as_str()?;
 
     let git = dependencies
+        .get("path")
+        .expect("Failed to get git-path")
+        .as_str()
+        .expect("Failed to get git-path as string");
+
+    if package == "jolt-sdk" && git == "../../wasm-jolt/jolt-sdk" {
+        return Some(
+            dependencies
+                .get("features")
+                .and_then(|v| v.as_array())
+                .map_or(false, |features| {
+                    features.iter().any(|f| f.as_str() == Some("guest-std"))
+                }),
+        );
+    }
+    /* let git = dependencies
         .get("git")
         .expect("Failed to get git-path")
         .as_str()
@@ -132,7 +148,7 @@ fn is_std() -> Option<bool> {
                     features.iter().any(|f| f.as_str() == Some("guest-std"))
                 }),
         );
-    }
+    } */
     None
 }
 
